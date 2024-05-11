@@ -21,11 +21,12 @@ const todoApi = createApi({
     updateTodo: builder.mutation({
       query: ({ id, ...updates }) => ({
         url: `/todos/${id}`,
-        method: "PATCH ",
+        method: "PATCH",
         body: updates,
       }),
       invalidatesTags: ["Todo"],
     }),
+
     deleteTodo: builder.mutation({
       query: (id) => ({
         url: `/todos/${id}`,
