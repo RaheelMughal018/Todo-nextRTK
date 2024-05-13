@@ -3,30 +3,30 @@
 import React, { useState } from "react";
 import TodoListItem from "./TodoListItem";
 import { useAddTodoMutation, useGetTodosQuery } from "@/lib/todo/apiSlice";
-
+import { useForm } from "react-hook-form";
 export default function TodoList() {
-  const [text, setText] = useState("");
+  const { register, handleSubmit, reset } = useForm();
+
   const { data: todos = [], isLoading, isError } = useGetTodosQuery();
   const [addTodo, { isLoading: isAddingTodo }] = useAddTodoMutation();
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (text.trim() === "") return;
-    addTodo({ title: text });
-    setText("");
+  const onSubmit = async (data) => {
+    try {
+      await addTodo({ title: data.text });
+      reset(); // Reset the form after successful submission
+    } catch (error) {
+      console.error("Error adding todo:", error);
+    }
   };
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching todos</div>;
   return (
     <div className="flex items-center flex-col">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="flex justify-between items-center mt-20"
       >
         <input
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-          }}
+          {...register("text", { required: true })}
           type="text"
           placeholder="Add a new task..."
           className="w-full mr-2 py-2 px-3 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 text-black"
